@@ -1,0 +1,25 @@
+[{
+    "model": "LinearRegressionModel",
+    "Train R2": "0.9221",
+    "Test R2": "0.9347",
+    "RMSE (log scale)": "0.0869",
+    "MAE": "0.0601",
+    "RMSE (dollars)": "$12,650",
+    "MAE (dollars)": "$9,127"
+},{
+    "model": "RandomForestModel",
+    "Train R2": "0.9973",
+    "Test R2": "0.9826",
+    "RMSE (log scale)": "0.0449",
+    "MAE": "0.0201",
+    "RMSE (dollars)": "$5,407",
+    "MAE (dollars)": "$2,864"
+},{
+    "model": "XGBoostModel",
+    "Train R2": "0.9999",
+    "Test R2": "0.9829",
+    "RMSE (log scale)": "0.0445",
+    "MAE": "0.0205",
+    "RMSE (dollars)": "$4,889",
+    "MAE (dollars)": "$2,849"
+}]

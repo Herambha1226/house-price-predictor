@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Predictor</title>
+    <style>
+    body { font-family: sans-serif; margin: 0; }
+    
+    .split {
+        height: 100vh;
+        position: fixed;
+        top: 0;
+    }
+
+    .left {
+        left: 0;
+        width: 35%;
+        background-color: #f8f9fa; /* Lighter, professional gray */
+        border-right: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .right {
+        right: 0;
+        width: 65%;
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Make inputs look better */
+    input[type="text"], .button_ui {
+        width: 100%;
+        max-width: 300px;
+        padding: 6px;
+        margin-bottom: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    input[type="option"], .options_ui{
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        margin-bottom:  15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .button_ui {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        border: none;
+    }
+
+    .button_ui:hover { background-color: #0056b3; }
+
+    h5 { margin-bottom: 5px; color: #555; }
+</style>
+
+<body>
+    <div class="split left">
+        <h3>INPUT FEATURES</h3>
+        <div>
+            <h5>Overall Quality (1-10)</h5>
+            <input type="range" id="quality" min="0" max="10" value="8" style="width:100%">
+            
+            <h5>Total Area (sq ft)</h5>
+            <input type="text" id="area" placeholder="e.g. 2500">
+            
+            <h5>Bedrooms</h5>
+            <input type="text" id="bedrooms" placeholder="3">
+            
+            <h5>Bathrooms</h5>
+            <input type="text" id="bathrooms" placeholder="2">
+
+            <h5>Neighborhood</h5>
+            <select id="neighbourhood" name="neighbourhood" class="options_ui">
+                <option>--Select Option--</option>
+                {% for opt in neighbourhood %}
+                    <option value="{{ opt }}">{{opt}}</option>
+                {% endfor %}
+            </select>
+
+            <h5>Year Built</h5>
+            <select id="year_built" name="year_built" class="options_ui">
+                <option>--Select Option--</option>
+                {% for opt in year_built %}
+                    <option value="{{ opt }}">{{opt}}</option>
+                {% endfor %}
+            </select>
+
+            <h5>Garages</h5>
+            <select id="garages" name="garages" class="options_ui">
+                <option>--Select Option--</option>
+                {% for opt in garages %}
+                    <option value="{{ opt }}">{{opt}}</option>
+                {% endfor %}
+            </select>
+            
+            <input type="submit" id="predict_btn" value="Predict Price" class="button_ui">
+        </div>
+    </div>
+    <script>
+        document.getElementById('predict_btn').onclick = function() {
+            // 1. Collect data from inputs
+            const data = {
+                quality: document.getElementById('quality').value,
+                area: document.getElementById('area').value,
+                bedrooms: document.getElementById('bedrooms').value,
+                bathrooms: document.getElementById('bathrooms').value,
+                neighborhood: document.getElementById('neighbourhood').value,
+                year_built: document.getElementById('year_built').value,
+                garages: document.getElementById('garages').value
+            };
+
+            // 2. Send to Flask via POST
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if(result.prediction) {
+                    document.getElementById('result').innerText = "Estimated Price: " + result.prediction;
+                    document.getElementById('result').style.fontSize = "24px";
+                    document.getElementById('result').style.color = "#28a745";
+                } else {
+                    alert("Error: " + result.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        };
+    </script>
+
+    <div class="split right">
+        <h1>House Price Prediction</h1>
+        <p id="result">Enter details to see the estimate.</p>
+    </div>
+</body>
