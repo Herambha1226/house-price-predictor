@@ -2,6 +2,14 @@ from flask import render_template, Flask, request, jsonify
 import joblib
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg') # use must before the pyplot import
+import matplotlib.pyplot as plt 
+import io
+import base64
+import json
+from sklearn.metrics import r2_score
+
 
 app = Flask(__name__)
 app.secret_key = "Herambha_House_Predictor"
@@ -28,10 +36,13 @@ model_xgb    = joblib.load("models/xgboost.pkl")
 model_random = joblib.load("models/random_forest.pkl")
 model_linear = joblib.load("models/linear_regression.pkl")
 
-print(f"Feature columns : {len(pred_columns)}")
-print(f"Columns         : {pred_columns}")
+with open("models_evaluation.json","r") as f:
+    evaluation_data = json.load(f)
+r2_scores = [float(m["Test R2"]) for m in evaluation_data]
 
-
+rmse_vals = [int(m["RMSE (dollars)"].replace("$","").replace(",",""))
+             for m in evaluation_data]
+model_names = [m["model"].replace("Model", "") for m in evaluation_data]
 @app.route('/')
 def main():
     return render_template("index.html",
@@ -40,6 +51,7 @@ def main():
         garages       = garages
     )
 
+    
 
 @app.route('/predict', methods=["POST"])
 def predict():
@@ -55,7 +67,7 @@ def predict():
         bathrooms = int(data.get('bathrooms', 0))
         year_pred = int(data.get('year_built', 2000))
 
-        print(f"INPUT → quality:{quality} area:{area} bed:{bedrooms} bath:{bathrooms} year:{year_pred}")
+        #print(f"INPUT → quality:{quality} area:{area} bed:{bedrooms} bath:{bathrooms} year:{year_pred}")
 
         input_dict = {col: 0 for col in pred_columns}
 
@@ -76,7 +88,7 @@ def predict():
         input_dict['PricePerSF']    = avg_price_per_sf
 
         input_df = pd.DataFrame([input_dict])[pred_columns]
-        print(f"Input shape : {input_df.shape}")   # must be (1, 42)
+        #print(f"Input shape : {input_df.shape}")   # must be (1, 42)
 
         pred_xgb    = float(np.expm1(model_xgb.predict(input_df)[0]))
         pred_random = float(np.expm1(model_random.predict(input_df)[0]))
@@ -86,6 +98,54 @@ def predict():
         print(f"RandomForest: ${pred_random:,.0f}")
         print(f"Linear      : ${pred_linear:,.0f}")
 
+        def safe_value(val,cap=1_000_000):
+            return min(val,cap)
+        
+        pred_xgb = safe_value(pred_xgb)
+        pred_random = safe_value(pred_random)
+        pred_linear = safe_value(pred_linear)
+
+    
+        fig,ax = plt.subplots(1,2,figsize=(12,5))
+
+        # prediction 
+        models = ["XGBoost","RandomForest","Linear"]
+        prediction = [pred_xgb,pred_random,pred_linear]
+
+        sorted_data = sorted(zip(models,prediction),key=lambda x: x[1])
+        m1,p1 = zip(*sorted_data)
+
+        ax[0].barh(m1,p1)
+
+        for i,v in enumerate(p1):
+            ax[0].text(v + max(p1)*0.01,i,f"${v:,.0f}",va="center")
+        ax[0].set_title("Prediction Comparision")
+        ax[0].set_xlabel("Price (USD)")
+
+        ax[0].spines["top"].set_visible(False)
+        ax[0].spines["right"].set_visible(False)
+
+        #  model accuracy
+        ax[1].bar(model_names,r2_scores)
+
+        for i,v in enumerate(r2_scores):
+            ax[1].text(i,v + 0.002,f"{v:.3f}",ha="center")
+        
+        ax[1].set_title("Model Accuracy (Test R2)")
+        ax[1].set_ylabel("R2 Score")
+
+        ax[1].spines["top"].set_visible(False)
+        ax[1].spines["right"].set_visible(False)
+
+        plt.tight_layout()
+
+        buf = io.BytesIO()
+        plt.savefig(buf,format="png",dpi=128,bbox_inches="tight")
+        buf.seek(0)
+        img_b64 = base64.b64encode(buf.read()).decode("utf-8")
+        plt.close()
+
+
         return jsonify({
             "success"    : True,
             "prediction" : f"${pred_xgb:,.0f}",
@@ -93,7 +153,8 @@ def predict():
             "random"     : f"${pred_random:,.0f}",
             "linear"     : f"${pred_linear:,.0f}",
             "low"        : f"${pred_xgb * 0.92:,.0f}",
-            "high"       : f"${pred_xgb * 1.08:,.0f}"
+            "high"       : f"${pred_xgb * 1.08:,.0f}",
+            "chart"      : img_b64
         })
 
     except Exception as e:
