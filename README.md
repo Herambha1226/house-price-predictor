@@ -20,7 +20,7 @@ Buying or selling a house requires accurate price estimation. Manual valuation i
 
 > 🔗 [Add your deployment link here]
 
-![App Screenshot](screenshots/project.png)
+![App Screenshot](screenshots/final_project.png)
 
 ---
 
