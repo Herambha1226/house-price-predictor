@@ -7,7 +7,6 @@
 [![XGBoost](https://img.shields.io/badge/XGBoost-2.x-FF6600?style=flat)](https://xgboost.readthedocs.io)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.x-F7931E?style=flat&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
 [![Pandas](https://img.shields.io/badge/Pandas-2.x-150458?style=flat&logo=pandas&logoColor=white)](https://pandas.pydata.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
@@ -21,56 +20,10 @@ Buying or selling a house requires accurate price estimation. Manual valuation i
 
 > 🔗 [Add your deployment link here]
 
-![App Screenshot](reports/project.png)
+![App Screenshot](screenshots/project.png)
 
 ---
 
-## 📁 Project Structure
-
-```
-house-price-predictor/
-│
-├── app.py                            # Flask web application
-│
-├── notebooks/
-│   ├── 01_eda.ipynb                  # Exploratory Data Analysis
-│   ├── 02_preprocessing.ipynb       # Data cleaning & encoding
-│   ├── 03_feature_engineering.ipynb # Feature creation
-│   ├── 04_model_training.ipynb      # Model training & comparison
-│   └── 05_model_evaluation.ipynb   # Metrics, SHAP, plots
-│
-├── src/
-│   ├── preprocess.py                # Reusable cleaning functions
-│   ├── feature_engineering.py      # Feature creation functions
-│   ├── train_model.py               # Model training script
-│   ├── evaluate.py                  # Evaluation & SHAP plots
-│   └── predict.py                   # Inference script
-│
-├── models/
-│   ├── xgboost.pkl                  # Final XGBoost model
-│   ├── random_forest.pkl            # Random Forest model
-│   ├── linear_regression.pkl        # Linear Regression baseline
-│   └── feature_columns.pkl         # Saved feature column names
-│
-├── data/
-│   ├── raw/                         # Original Kaggle dataset
-│   └── processed/                   # Cleaned & engineered dataset
-│
-├── templates/
-│   └── index.html                   # Flask HTML template
-│
-├── static/
-│   └── style.css                    # Custom CSS
-│
-├── reports/
-│   ├── model_comparison.csv         # All model results
-│   ├── Models_Performance.png       # 4-chart model comparison plot
-│   └── project.png                  # App screenshot
-│
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
 
 ---
 
@@ -97,7 +50,8 @@ house-price-predictor/
 | `HouseAge` | `YrSold - YearBuilt` | Age at time of sale |
 | `HasGarage` | `1 if GarageArea > 0 else 0` | Binary garage presence |
 | `OverallScore` | `OverallQual × OverallCond` | Combined quality signal |
-
+| `HasFireplace`| `Fireplace > 0` | Having at least one fireplace adds value |
+| `HasPool` | `PoolArea > 0 ` | 99% of houses have PoolArea = 0
 ---
 
 ## 🤖 Models Trained & Compared
@@ -110,7 +64,7 @@ house-price-predictor/
 
 > ✅ XGBoost selected as final model — best test R² and lowest RMSE.
 
-![Model Performance Charts](reports/Models_Performance.png)
+![Model Performance Charts](screenshots/Models_Performance.png)
 
 > The 4 charts above show: R² comparison, Error comparison (log scale), Error in real dollars, and Overfitting gap (Train - Test) across all 3 models.
 
@@ -142,11 +96,9 @@ house-price-predictor/
 | Language | Python 3.10+ |
 | ML Models | XGBoost, scikit-learn, Random Forest, Linear Regression |
 | Data Processing | Pandas, NumPy |
-| Visualization | Matplotlib, Seaborn, Plotly |
-| Explainability | SHAP |
+| Visualization | Matplotlib |
 | Web Framework | Flask |
 | Frontend | HTML, CSS, JavaScript |
-| Hyperparameter Tuning | Optuna |
 | Serialization | Joblib |
 
 ---
@@ -155,7 +107,7 @@ house-price-predictor/
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/your-username/house-price-predictor.git
+git clone https://github.com/Herambha1226/house-price-predictor.git
 cd house-price-predictor
 ```
 
@@ -170,9 +122,10 @@ Download `train.csv` from [Kaggle](https://www.kaggle.com/c/house-prices-advance
 
 **4. Run preprocessing and training**
 ```bash
-python src/preprocess.py
-python src/feature_engineering.py
+python src/eda_of_data.py
+python src/preprocessed_data.py
 python src/train_model.py
+python src/model_comparision.py
 ```
 
 **5. Start the Flask app**
@@ -195,14 +148,8 @@ pandas
 numpy
 scikit-learn
 xgboost
-lightgbm
-shap
 joblib
 matplotlib
-seaborn
-plotly
-optuna
-colorama
 ```
 
 ---
@@ -222,37 +169,18 @@ colorama
 - Model trained on Ames, Iowa data only — predictions for other cities will be inaccurate.
 - `PricePerSF` is a derived feature from `SalePrice / TotalSF` which causes data leakage. Dataset mean is used as a placeholder at inference time. This feature would be removed in a production system.
 - Categorical features (Neighbourhood, GarageType) are not fully encoded in the current prediction pipeline.
-
 ---
 
-## 🔮 Future Improvements
-
-- [ ] Add one-hot encoding for categorical features at inference time
-- [ ] Add SHAP waterfall chart per prediction in the web UI
-- [ ] Deploy to Render with Docker
-- [ ] Add neighbourhood price map with Folium
-- [ ] Experiment with neural network approach (TabNet)
-- [ ] Add model retraining pipeline
-
 ---
-
 ## 👤 Author
 
 **Herambha**
 
-[![GitHub](https://img.shields.io/badge/GitHub-your--username-181717?style=flat&logo=github)](https://github.com/your-username)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=flat&logo=linkedin)](https://linkedin.com/in/your-profile)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+[![GitHub](https://img.shields.io/badge/GitHub-Herambha1226-181717?style=flat&logo=github)](https://github.com/Herambha1226)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/herambha-karthikeya-guptha-pallpothu/)
 
 ---
 
 ## 🙏 Acknowledgements
 
 - [Kaggle House Prices Competition](https://www.kaggle.com/c/house-prices-advanced-regression-techniques) for the dataset
-- [SHAP Library](https://shap.readthedocs.io) for model explainability
-- [XGBoost Documentation](https://xgboost.readthedocs.io)
