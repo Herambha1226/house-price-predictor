@@ -18,7 +18,7 @@ Buying or selling a house requires accurate price estimation. Manual valuation i
 
 ## 🖥️ Live Demo
 
-> 🔗 [Add your deployment link here]
+> 🔗 [https://house-price-predictor-ll2a.onrender.com/]
 
 ![App Screenshot](screenshots/final_project.png)
 
